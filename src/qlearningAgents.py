@@ -99,9 +99,10 @@ class QLearningAgent(ReinforcementAgent):
         if len(legalActions) == 0:
             return None
         
-        # Se decidir explorar, escolhe ação legal aleatória 
         if util.flipCoin(self.epsilon):
             action = random.choice(legalActions)
+        else:
+            action = self.computeActionFromQValues(state)
 
         return action
 
