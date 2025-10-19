@@ -45,6 +45,15 @@ class ValueIterationAgent(ValueEstimationAgent):
         # Write value iteration code here
         "*** YOUR CODE HERE ***"
 
+        for i in range(iterations):
+            valuesNovos = util.Counter()
+            for state in self.mdp.getStates():
+                if self.mdp.isTerminal(state):
+                    continue
+                action = self.getAction(state)
+
+                valuesNovos[state] = self.mdp.getReward(state, None, None) + self._computeQValueFromValues(state, action)
+            self.values = valuesNovos
 
     def getValue(self, state):
         """
@@ -52,13 +61,35 @@ class ValueIterationAgent(ValueEstimationAgent):
         """
         return self.values[state]
 
+    def _computeQValueFromValues(self, state, action):
+        """
+          Compute the Q-value of action in state from the
+          value function stored in self.values.
+        """
+        "*** YOUR CODE HERE ***"
+        p = self.mdp.getTransitionStatesAndProbs(state, action)
+
+        q = 0
+        for i in p:
+            q += i[1] * self.values[i[0]]
+
+        return self.discount * q
+
     def computeQValueFromValues(self, state, action):
         """
           Compute the Q-value of action in state from the
           value function stored in self.values.
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        p = self.mdp.getTransitionStatesAndProbs(state, action)
+        if self.mdp.isTerminal(p[0][0]):
+            return self.mdp.getReward(state, None, None)
+
+        q = 0
+        for i in p:
+            q += i[1] * self.values[i[0]]
+
+        return self.discount * q
 
     def computeActionFromValues(self, state):
         """
@@ -70,7 +101,15 @@ class ValueIterationAgent(ValueEstimationAgent):
           terminal state, you should return None.
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        a = self.mdp.getPossibleActions(state)
+        print()
+        q = list(map(lambda x: self._computeQValueFromValues(state, x), a))
+        qMax = max(q, default=None)
+        if qMax is None:
+            return None
+        i = q.index(qMax)
+
+        return a[i]
 
     def getPolicy(self, state):
         return self.computeActionFromValues(state)
