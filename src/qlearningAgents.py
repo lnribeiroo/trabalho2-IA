@@ -182,16 +182,27 @@ class ApproximateQAgent(PacmanQAgent):
         return self.weights * features
 
     def update(self, state, action, nextState, reward):
-        """
-           Should update your weights based on transition
-        """
-        nextValue = self.computeValueFromQValues(nextState)
-        difference = (reward + self.discount * nextValue) - self.getQValue(state, action)
-        
-        features = self.featExtractor.getFeatures(state, action)
-        for feature in features:
-            self.weights[feature] += self.alpha * difference * features[feature]
-
+            """
+                Should update your weights based on transition
+            """
+            # 1. Calcular o Valor Máximo-Q do próximo estado (max_a' Q(s', a'))
+            nextValue = self.computeValueFromQValues(nextState)
+            
+            # 2. Calcular a diferença temporal (delta)
+            # Q(s, a) é obtido através de self.getQValue(state, action)
+            
+            # difference = (r + gamma * max_a' Q(s', a')) - Q(s, a)
+            difference = (reward + self.discount * nextValue) - self.getQValue(state, action)
+            
+            # 3. Obter as features f(s, a)
+            features = self.featExtractor.getFeatures(state, action)
+            
+            # 4. Atualizar os pesos: w_i <- w_i + alpha * delta * f_i(s, a)
+            for feature in features:
+                # self.alpha é a taxa de aprendizado (alpha)
+                # features[feature] é o valor da feature f_i(s, a)
+                self.weights[feature] += self.alpha * difference * features[feature]
+                
     def final(self, state):
         "Called at the end of each game."
         # call the super-class final method
