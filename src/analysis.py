@@ -24,6 +24,9 @@ def question2():
     answerNoise = 0.0
     return answerDiscount, answerNoise
 
+def question6():
+    return [0.5, 1.0]
+
 if __name__ == '__main__':
     print('Answers to analysis questions:')
     import analysis
